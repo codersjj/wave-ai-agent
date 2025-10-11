@@ -42,3 +42,8 @@ Detailed plans for accomplishing tasks.
   - [x] NuqsAdapter
   - [x] Suspense
 - [x] add Logo component
+
+## Database(Neon, Prisma ORM)
+
+- [x] set up Neon
+- [x] set up Prisma
