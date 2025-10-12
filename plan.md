@@ -47,3 +47,7 @@ Detailed plans for accomplishing tasks.
 
 - [x] set up Neon
 - [x] set up Prisma
+
+## Authentication(Better Auth)
+
+- [ ] integrate Better Auth
