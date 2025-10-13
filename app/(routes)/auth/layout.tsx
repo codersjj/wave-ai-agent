@@ -15,5 +15,10 @@ export default async function AuthLayout({
   if (session) {
     redirect("/home");
   }
-  return <div>AuthLayout{children}</div>;
+  return (
+    <div>
+      {/* AuthLayout */}
+      {children}
+    </div>
+  );
 }

@@ -23,7 +23,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistSans.className} antialiased`}
       >
-        <Providers>app layout{children}</Providers>
+        <Providers>
+          {/* app layout */}
+          {children}
+        </Providers>
       </body>
     </html>
   );
