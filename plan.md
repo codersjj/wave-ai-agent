@@ -63,5 +63,7 @@ Detailed plans for accomplishing tasks.
   - see:
     - [Bearer Token Authentication](https://www.better-auth.com/docs/plugins/bearer)
     - [Open API](https://www.better-auth.com/docs/plugins/open-api)
+  - [x] Use Bearer Tokens
+    - see: [How to Use Bearer Tokens](https://www.better-auth.com/docs/plugins/bearer#how-to-use-bearer-tokens)
 - [x] add useAuthToken hook with zustand
   - see: [Persisting a state](https://zustand.docs.pmnd.rs/middlewares/persist#persisting-a-state)
