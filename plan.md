@@ -56,3 +56,6 @@ Detailed plans for accomplishing tasks.
     - [Better Auth CLI](https://www.better-auth.com/docs/concepts/cli)
     - [baseline your database](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining)
     - [set config to use Prisma Migrate with Prisma Accelerate](https://www.prisma.io/docs/guides/neon-accelerate#4-set-up-accelerate-in-the-prisma-console)
+- [ ] use session on the server side
+  - see: [basic usage](https://www.better-auth.com/docs/basic-usage#server-side)
+- [ ] add sign in/sign up pages
