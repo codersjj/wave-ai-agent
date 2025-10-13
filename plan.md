@@ -50,12 +50,18 @@ Detailed plans for accomplishing tasks.
 
 ## Authentication(Better Auth)
 
-- [ ] integrate Better Auth
+- [x] integrate Better Auth
   - see:
     - [Better Auth Installation](https://www.better-auth.com/docs/installation)
     - [Better Auth CLI](https://www.better-auth.com/docs/concepts/cli)
     - [baseline your database](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining)
     - [set config to use Prisma Migrate with Prisma Accelerate](https://www.prisma.io/docs/guides/neon-accelerate#4-set-up-accelerate-in-the-prisma-console)
-- [ ] use session on the server side
+- [x] use session on the server side
   - see: [basic usage](https://www.better-auth.com/docs/basic-usage#server-side)
-- [ ] add sign in/sign up pages
+- [x] add sign in/sign up pages
+- [x] add bearer and openAPI plugins
+  - see:
+    - [Bearer Token Authentication](https://www.better-auth.com/docs/plugins/bearer)
+    - [Open API](https://www.better-auth.com/docs/plugins/open-api)
+- [x] add useAuthToken hook with zustand
+  - see: [Persisting a state](https://zustand.docs.pmnd.rs/middlewares/persist#persisting-a-state)
