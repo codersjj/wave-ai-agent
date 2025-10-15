@@ -69,7 +69,7 @@ const SignInForm = () => {
           }
 
           router.replace("/home");
-          setIsLoading(false);
+          // setIsLoading(false);
           toast.success("Sign in successful");
         },
         onError: (ctx) => {

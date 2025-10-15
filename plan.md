@@ -67,3 +67,7 @@ Detailed plans for accomplishing tasks.
     - see: [How to Use Bearer Tokens](https://www.better-auth.com/docs/plugins/bearer#how-to-use-bearer-tokens)
 - [x] add useAuthToken hook with zustand
   - see: [Persisting a state](https://zustand.docs.pmnd.rs/middlewares/persist#persisting-a-state)
+
+## Dashboard UI
+
+- [ ] sidebar
