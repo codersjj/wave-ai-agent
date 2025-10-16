@@ -70,4 +70,5 @@ Detailed plans for accomplishing tasks.
 
 ## Dashboard UI
 
-- [ ] sidebar
+- [x] sidebar
+- [x] main content

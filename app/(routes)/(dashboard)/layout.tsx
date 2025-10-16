@@ -6,6 +6,7 @@ import { RiLoader5Fill } from "@remixicon/react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/sidebar";
 import { auth } from "@/lib/auth"; // path to your Better Auth server instance
+import MainContent from "./_common/main-content";
 
 export default async function DashboardLayout({
   children,
@@ -37,7 +38,7 @@ export default async function DashboardLayout({
           <SidebarInset
           // className="relative overflow-x-hidden pt-0"
           >
-            sidebar inset{children}
+            <MainContent>{children}</MainContent>
           </SidebarInset>
         </SidebarProvider>
       </NuqsAdapter>

@@ -156,3 +156,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+.fade-in-up {
+  animation: fade-in-up 0.6s ease-out 0.2s forwards;
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    translate: 0 10px;
+  }
+
+  100% {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
