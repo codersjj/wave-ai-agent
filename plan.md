@@ -72,3 +72,14 @@ Detailed plans for accomplishing tasks.
 
 - [x] sidebar
 - [x] main content
+
+## Hono Setup
+
+- [x] setup
+  - [x] `npm install hono @hono/zod-validator`
+  - see: [Zod Validator Middleware](https://hono.dev/docs/guides/validation#zod-validator-middleware)
+- [x] add middleware for Better Auth
+- [x] add the RPC feature
+  - [x] Server
+  - [x] Client
+  - see: [RPC](https://hono.dev/docs/guides/rpc)

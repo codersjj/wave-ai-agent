@@ -10,10 +10,10 @@ const MainSection = () => {
         <div className="mt-16 w-full flex justify-center items-center gap-2">
           <h1
             className="flex items-center gap-2 font-semibold tracking-tighter
-            text-2xl sm:text-3xl md:text-4xl text-pretty text-gray-800 dark:text-white
+            text-xl sm:text-2xl md:text-4xl text-pretty text-gray-800 dark:text-white
             opacity-0 fade-in-up"
           >
-            <RiEmotionHappyFill className="size-[24px]" />
+            <RiEmotionHappyFill className="size-[24px] md:size-10" />
             How can I help you today?
           </h1>
         </div>
