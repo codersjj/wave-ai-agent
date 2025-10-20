@@ -83,3 +83,8 @@ Detailed plans for accomplishing tasks.
   - [x] Server
   - [x] Client
   - see: [RPC](https://hono.dev/docs/guides/rpc)
+
+## Note API & UI
+
+- [x] develop Note API
+- [ ] add create note component

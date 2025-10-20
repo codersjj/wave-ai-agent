@@ -22,9 +22,24 @@ export const useCreateNote = () => {
 
   return useMutation<ResponseCreateNoteType, Error, RequestCreateNoteType>({
     mutationFn: async (json) => {
-      const res = await api.note.create.$post({ json });
+      // const res = await api.note.create.$post({ json });
 
-      return await res.json();
+      // return await res.json();
+
+      // Mock data for testing
+      return new Promise((resolve) => {
+        resolve({
+          success: true,
+          data: {
+            id: "1",
+            title: "Note 1",
+            content: "Content 1",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            userId: "1",
+          },
+        });
+      });
     },
     onSuccess: async () => {
       toast.success("Note created successfully");
