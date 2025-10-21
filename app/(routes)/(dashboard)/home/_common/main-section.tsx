@@ -1,5 +1,6 @@
 import { RiEmotionHappyFill } from "@remixicon/react";
 import Header from "../../_common/header";
+import RecentNotes from "./recent-notes";
 
 const MainSection = () => {
   return (
@@ -21,10 +22,11 @@ const MainSection = () => {
         {/* Chat Interface */}
 
         <div className="w-full pt-7">
-          <div>
+          {/* <div>
             <span className="text-sm dark:text-white/50">Recent Notes</span>
-          </div>
+          </div> */}
           {/* Recent Notes */}
+          <RecentNotes />
         </div>
       </div>
     </>

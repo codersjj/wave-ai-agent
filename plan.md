@@ -87,4 +87,5 @@ Detailed plans for accomplishing tasks.
 ## Note API & UI
 
 - [x] develop Note API
-- [ ] add create note component
+- [x] add create/update note UI
+- [x] add recent notes UI
