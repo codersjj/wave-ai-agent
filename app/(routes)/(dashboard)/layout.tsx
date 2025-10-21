@@ -7,6 +7,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/sidebar";
 import { auth } from "@/lib/auth"; // path to your Better Auth server instance
 import MainContent from "./_common/main-content";
+import NoteDialog from "@/components/note-dialog";
 
 export default async function DashboardLayout({
   children,
@@ -39,6 +40,7 @@ export default async function DashboardLayout({
           // className="relative overflow-x-hidden pt-0"
           >
             <MainContent>{children}</MainContent>
+            <NoteDialog />
           </SidebarInset>
         </SidebarProvider>
       </NuqsAdapter>

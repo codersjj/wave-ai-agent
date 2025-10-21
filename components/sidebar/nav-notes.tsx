@@ -11,6 +11,7 @@ import {
 } from "../ui/sidebar";
 import { useCreateNote, useNotes } from "@/features/use-notes";
 import LoaderOverlay from "../loader-overlay";
+import useNoteId from "@/hooks/use-note-id";
 
 const SidebarMenuSkeletonClient = dynamic(
   () => import("../ui/sidebar").then((m) => m.SidebarMenuSkeleton),
@@ -20,6 +21,7 @@ const SidebarMenuSkeletonClient = dynamic(
 const NavNotes = () => {
   const { data, isPending: isLoadingNotes } = useNotes();
   const { mutate, isPending: isCreatingNote } = useCreateNote();
+  const { noteId, setNoteId } = useNoteId();
 
   const notes = data?.data ?? [];
 
@@ -28,6 +30,10 @@ const NavNotes = () => {
       title: "Untitled",
       content: "",
     });
+  };
+
+  const handleNoteClick = (noteId: string) => {
+    setNoteId(noteId);
   };
 
   return (
@@ -57,10 +63,13 @@ const NavNotes = () => {
               <div className="mt-4">No Notes</div>
             ) : (
               notes.map((note) => {
-                // const isActive = note.id === noteId
+                const isActive = note.id === noteId;
                 return (
                   <SidebarMenuItem key={note.id}>
-                    <SidebarMenuButton onClick={() => {}}>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      onClick={() => handleNoteClick(note.id)}
+                    >
                       <span className="flex justify-center items-center size-8 rounded-lg bg-secondary">
                         <RiFileTextLine className="size-4! text-primary" />
                       </span>

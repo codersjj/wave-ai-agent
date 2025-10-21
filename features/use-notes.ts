@@ -2,6 +2,7 @@ import { api } from "@/lib/hono/rpc";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
+import useNoteId from "@/hooks/use-note-id";
 
 type RequestCreateNoteType = InferRequestType<
   typeof api.note.create.$post
@@ -19,29 +20,32 @@ type ResponseUpdateNoteType = InferResponseType<
 
 export const useCreateNote = () => {
   const queryClient = useQueryClient();
+  const { setNoteId } = useNoteId();
 
   return useMutation<ResponseCreateNoteType, Error, RequestCreateNoteType>({
     mutationFn: async (json) => {
-      // const res = await api.note.create.$post({ json });
+      const res = await api.note.create.$post({ json });
 
-      // return await res.json();
+      return await res.json();
 
       // Mock data for testing
-      return new Promise((resolve) => {
-        resolve({
-          success: true,
-          data: {
-            id: "1",
-            title: "Note 1",
-            content: "Content 1",
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            userId: "1",
-          },
-        });
-      });
+      // return new Promise((resolve) => {
+      //   resolve({
+      //     success: true,
+      //     data: {
+      //       id: "1",
+      //       title: "Note 1",
+      //       content: "Content 1",
+      //       createdAt: new Date().toISOString(),
+      //       updatedAt: new Date().toISOString(),
+      //       userId: "1",
+      //     },
+      //   });
+      // });
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      const noteId = data.data.id;
+      setNoteId(noteId);
       toast.success("Note created successfully");
       await queryClient.invalidateQueries({
         queryKey: ["notes"],
