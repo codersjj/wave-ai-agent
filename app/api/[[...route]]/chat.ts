@@ -17,6 +17,8 @@ import { generateUUID } from "@/lib/utils";
 import { HTTPException } from "hono/http-exception";
 import createNote from "@/lib/ai/tools/create-note";
 import searchNote from "@/lib/ai/tools/search-note";
+import webSearch from "@/lib/ai/tools/web-search";
+import extractWebUrl from "@/lib/ai/tools/extract-web-url";
 
 const chatSchema = z.object({
   /**
@@ -109,6 +111,8 @@ export const chatApp = new Hono().post(
         tools: {
           createNote: createNote(user.id),
           searchNote: searchNote(user.id),
+          webSearch: webSearch(),
+          extractWebUrl: extractWebUrl(),
         },
         toolChoice: "auto",
         stopWhen: stepCountIs(5),
