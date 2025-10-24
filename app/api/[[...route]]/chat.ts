@@ -15,6 +15,8 @@ import { generateTitleForUserMessage } from "@/app/actions";
 import { isProduction, myProvider } from "@/lib/ai/provider";
 import { generateUUID } from "@/lib/utils";
 import { HTTPException } from "hono/http-exception";
+import createNote from "@/lib/ai/tools/create-note";
+import searchNote from "@/lib/ai/tools/search-note";
 
 const chatSchema = z.object({
   /**
@@ -104,7 +106,10 @@ export const chatApp = new Hono().post(
         model,
         system: "",
         messages: modelMessages,
-        // tools: {},
+        tools: {
+          createNote: createNote(user.id),
+          searchNote: searchNote(user.id),
+        },
         toolChoice: "auto",
         stopWhen: stepCountIs(5),
         onError: (error) => {
