@@ -89,3 +89,7 @@ Detailed plans for accomplishing tasks.
 - [x] develop Note API
 - [x] add create/update note UI
 - [x] add recent notes UI
+
+## Chat API
+
+- [] develop Chat API

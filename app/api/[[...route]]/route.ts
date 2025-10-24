@@ -1,12 +1,16 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import { HTTPException } from "hono/http-exception";
-import { noteApp } from "./note";
 import { getAuthUserMiddleware } from "@/lib/hono/middleware";
+import { noteApp } from "./note";
+import { chatApp } from "./chat";
 
 export const runtime = "nodejs";
 
-const app = new Hono().basePath("/api").route("/note", noteApp);
+const app = new Hono()
+  .basePath("/api")
+  .route("/note", noteApp)
+  .route("/chat", chatApp);
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
