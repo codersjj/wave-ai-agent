@@ -19,6 +19,7 @@ import createNote from "@/lib/ai/tools/create-note";
 import searchNote from "@/lib/ai/tools/search-note";
 import webSearch from "@/lib/ai/tools/web-search";
 import extractWebUrl from "@/lib/ai/tools/extract-web-url";
+import { getSystemPrompt } from "@/lib/ai/prompt";
 
 const chatSchema = z.object({
   /**
@@ -106,7 +107,7 @@ export const chatApp = new Hono().post(
       );
       const result = await streamText({
         model,
-        system: "",
+        system: getSystemPrompt(selectedToolName),
         messages: modelMessages,
         tools: {
           createNote: createNote(user.id),
