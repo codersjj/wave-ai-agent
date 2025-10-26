@@ -33,125 +33,206 @@ const chatSchema = z.object({
   selectedToolName: z.string().nullable(),
 });
 
-export const chatApp = new Hono().post(
-  "/",
-  zValidator("json", chatSchema),
-  getAuthUserMiddleware,
-  async (c) => {
-    try {
-      const user = c.get("user");
-      const { id, message, selectedModelId, selectedToolName } =
-        c.req.valid("json");
+const chatIdSchema = z.object({
+  id: z.string().min(1),
+});
 
-      // find the chat data
-      let chat = await prisma.chat.findUnique({
-        where: {
-          id,
-        },
-      });
+export const chatApp = new Hono()
+  .post(
+    "/",
+    zValidator("json", chatSchema),
+    getAuthUserMiddleware,
+    async (c) => {
+      try {
+        const user = c.get("user");
+        const { id, message, selectedModelId, selectedToolName } =
+          c.req.valid("json");
 
-      // if the chat is not existed, create
-      if (!chat) {
-        const title = await generateTitleForUserMessage(message);
-        chat = await prisma.chat.create({
-          data: {
+        // find the chat data
+        let chat = await prisma.chat.findUnique({
+          where: {
             id,
-            userId: user.id,
-            title,
           },
         });
-      }
 
-      // get messages of this chat from db
-      const messagesFromDB = await prisma.message.findMany({
+        // if the chat is not existed, create
+        if (!chat) {
+          const title = await generateTitleForUserMessage(message);
+          chat = await prisma.chat.create({
+            data: {
+              id,
+              userId: user.id,
+              title,
+            },
+          });
+        }
+
+        // get messages of this chat from db
+        const messagesFromDB = await prisma.message.findMany({
+          where: {
+            chatId: id,
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        });
+
+        const mappedUIMessages = messagesFromDB.map(
+          ({ id, role, parts, chatId, createdAt, updatedAt }) => ({
+            id,
+            role,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            parts: parts as UIMessagePart<any, any>[],
+            metadata: {
+              chatId,
+              createdAt,
+              updatedAt,
+            },
+          })
+        );
+
+        // add new message
+        const newUIMessages = [...mappedUIMessages, message];
+
+        const modelMessages = convertToModelMessages(newUIMessages);
+
+        // save new message to DB
+        await prisma.message.create({
+          data: {
+            id: message.id,
+            role: "user",
+            parts: JSON.parse(JSON.stringify(message.parts)),
+            chatId: id,
+          },
+        });
+
+        // ask AI model
+        const model = myProvider.languageModel(
+          isProduction ? selectedModelId : DEVELOPMENT_CHAT_MODEL
+        );
+        const result = await streamText({
+          model,
+          system: getSystemPrompt(selectedToolName),
+          messages: modelMessages,
+          tools: {
+            createNote: createNote(user.id),
+            searchNote: searchNote(user.id),
+            webSearch: webSearch(),
+            extractWebUrl: extractWebUrl(),
+          },
+          toolChoice: "auto",
+          stopWhen: stepCountIs(5),
+          onError: (error) => {
+            console.log("Streaming error:", error);
+          },
+        });
+
+        return result.toUIMessageStreamResponse({
+          sendSources: true,
+          sendReasoning: true,
+          originalMessages: newUIMessages,
+          onFinish: async (event) => {
+            const { messages, responseMessage } = event;
+            console.log("completed messages length", messages.length);
+            console.log("responseMessage", responseMessage);
+            try {
+              await prisma.message.createMany({
+                data: messages.map((m) => ({
+                  id: m.id || generateUUID(),
+                  role: m.role,
+                  parts: JSON.parse(JSON.stringify(m.parts)),
+                  chatId: id,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                })),
+                skipDuplicates: true,
+              });
+            } catch (error) {
+              console.log("toUIMessageStreamResponse onFinish error:", error);
+            }
+          },
+        });
+      } catch (error) {
+        if (error instanceof HTTPException) {
+          throw error;
+        }
+        throw new HTTPException(500, { message: "Internal Server Error" });
+      }
+    }
+  )
+  .get("/", getAuthUserMiddleware, async (c) => {
+    try {
+      const user = c.get("user");
+      const chats = await prisma.chat.findMany({
         where: {
-          chatId: id,
+          userId: user.id,
         },
         orderBy: {
-          createdAt: "asc",
+          createdAt: "desc",
         },
       });
 
-      const mappedUIMessages = messagesFromDB.map(
-        ({ id, role, parts, chatId, createdAt, updatedAt }) => ({
-          id,
-          role,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          parts: parts as UIMessagePart<any, any>[],
-          metadata: {
-            chatId,
-            createdAt,
-            updatedAt,
-          },
-        })
-      );
-
-      // add new message
-      const newUIMessages = [...mappedUIMessages, message];
-
-      const modelMessages = convertToModelMessages(newUIMessages);
-
-      // save new message to DB
-      await prisma.message.create({
-        data: {
-          id: message.id,
-          role: "user",
-          parts: JSON.parse(JSON.stringify(message.parts)),
-          chatId: id,
-        },
-      });
-
-      // ask AI model
-      const model = myProvider.languageModel(
-        isProduction ? selectedModelId : DEVELOPMENT_CHAT_MODEL
-      );
-      const result = await streamText({
-        model,
-        system: getSystemPrompt(selectedToolName),
-        messages: modelMessages,
-        tools: {
-          createNote: createNote(user.id),
-          searchNote: searchNote(user.id),
-          webSearch: webSearch(),
-          extractWebUrl: extractWebUrl(),
-        },
-        toolChoice: "auto",
-        stopWhen: stepCountIs(5),
-        onError: (error) => {
-          console.log("Streaming error:", error);
-        },
-      });
-
-      return result.toUIMessageStreamResponse({
-        sendSources: true,
-        sendReasoning: true,
-        originalMessages: newUIMessages,
-        onFinish: async (event) => {
-          const { messages, responseMessage } = event;
-          console.log("completed messages length", messages.length);
-          console.log("responseMessage", responseMessage);
-          try {
-            await prisma.message.createMany({
-              data: messages.map((m) => ({
-                id: m.id || generateUUID(),
-                role: m.role,
-                parts: JSON.parse(JSON.stringify(m.parts)),
-                chatId: id,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              })),
-              skipDuplicates: true,
-            });
-          } catch (error) {
-            console.log("toUIMessageStreamResponse onFinish error:", error);
-          }
-        },
+      return c.json({
+        success: true,
+        data: chats,
       });
     } catch (error) {
-      if (error instanceof HTTPException) {
-        throw error;
-      }
+      console.log("Failed to fetch chats", error);
       throw new HTTPException(500, { message: "Internal Server Error" });
     }
-  }
-);
+  })
+  .get(
+    "/:id",
+    zValidator("param", chatIdSchema),
+    getAuthUserMiddleware,
+    async (c) => {
+      try {
+        const { id } = c.req.valid("param");
+        const user = c.get("user");
+
+        const chat = await prisma.chat.findFirst({
+          where: {
+            id,
+            userId: user.id,
+          },
+          include: {
+            messages: {
+              orderBy: { createdAt: "desc" },
+            },
+          },
+        });
+
+        if (!chat) {
+          return c.json({
+            success: true,
+            data: {},
+          });
+        }
+
+        const uiMessages: UIMessage[] = chat.messages.map((m) => ({
+          id: m.id,
+          role: m.role,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          parts: m.parts as UIMessagePart<any, any>[],
+          metadata: {
+            createdAt: m.createdAt,
+            updatedAt: m.updatedAt,
+            chatId: m.chatId,
+          },
+        }));
+
+        const chatWithUIMessages = {
+          ...chat,
+          messages: uiMessages,
+        };
+
+        return c.json({
+          success: true,
+          data: chatWithUIMessages,
+        });
+      } catch (error) {
+        console.log("Failed to fetch chat", error);
+        throw new HTTPException(500, { message: "Internal Server Error" });
+      }
+    }
+  );
