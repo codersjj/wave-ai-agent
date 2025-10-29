@@ -58,6 +58,7 @@ export const chatApp = new Hono()
         // if the chat is not existed, create
         if (!chat) {
           const title = await generateTitleForUserMessage(message);
+          console.log("🚀 ~ title:", title);
           chat = await prisma.chat.create({
             data: {
               id,

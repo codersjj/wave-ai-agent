@@ -92,4 +92,8 @@ Detailed plans for accomplishing tasks.
 
 ## Chat API
 
-- [] develop Chat API
+- [x] develop Chat API
+
+## Chat Interface
+
+- [x] develop Chat Input component

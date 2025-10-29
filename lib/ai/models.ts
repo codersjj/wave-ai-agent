@@ -29,7 +29,7 @@ export const chatModels: ChatModel[] = [
 ];
 
 export const DEFAULT_MODEL_ID = chatModels[0].id;
-export const DEVELOPMENT_CHAT_MODEL = "google/gemini-2.5-flash-lite";
+export const DEVELOPMENT_CHAT_MODEL = "models/gemini-2.5-flash-lite";
 export const MODEL_OPTIONS = chatModels.map((model) => ({
   value: model.id,
   label: model.name,

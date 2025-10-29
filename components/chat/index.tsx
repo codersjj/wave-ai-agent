@@ -6,6 +6,7 @@ import { useChat } from "@ai-sdk/react";
 import { generateUUID } from "@/lib/utils";
 import { DEFAULT_MODEL_ID } from "@/lib/ai/models";
 import ChatInput from "./chat-input";
+import { toast } from "sonner";
 
 interface ChatInterfaceProps {
   chatId: string;
@@ -32,11 +33,12 @@ const ChatInterface = ({
       transport: new DefaultChatTransport({
         api: "/api/chat",
         prepareSendMessagesRequest: ({ id, messages, body }) => {
+          console.log("🚀 ~ ChatInterface ~ body:", body);
           return {
             body: {
               ...body,
               id,
-              messages: messages.at(-1),
+              message: messages.at(-1),
               selectedModelId: DEFAULT_MODEL_ID,
             },
           };
@@ -46,6 +48,7 @@ const ChatInterface = ({
       onFinish: () => {},
       onError: (error) => {
         console.log("Chat error:", error);
+        toast.error(error instanceof Error ? error.message : "useChat error");
       },
     });
 
