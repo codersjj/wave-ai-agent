@@ -113,6 +113,15 @@ export const chatApp = new Hono()
         );
         const result = await streamText({
           model,
+          providerOptions: {
+            google: {
+              // see: https://ai.google.dev/gemini-api/docs/thinking
+              thinkingConfig: {
+                thinkingBudget: 1024,
+                includeThoughts: true,
+              },
+            },
+          },
           system: getSystemPrompt(selectedToolName),
           messages: modelMessages,
           tools: {
