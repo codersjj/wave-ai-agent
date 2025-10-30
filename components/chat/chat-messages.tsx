@@ -1,4 +1,5 @@
 import { ChatStatus, TextUIPart, UIMessage } from "ai";
+import { useStickToBottom } from "use-stick-to-bottom";
 import { Conversation, ConversationContent } from "../ai-elements/conversation";
 import { Message, MessageContent } from "../ai-elements/message";
 import { Skeleton } from "../ui/skeleton";
@@ -24,45 +25,50 @@ const ChatMessages = ({
   isLoading,
 }: ChatMessagesProps) => {
   console.log("🚀 ~ ChatMessages ~ messages:", messages);
+  // see: https://github.com/stackblitz-labs/use-stick-to-bottom?tab=readme-ov-file#usesticktobottom-hook
+  const { scrollRef, contentRef } = useStickToBottom();
+
   return (
-    <div>
-      <Conversation className="min-h-[calc(100vh-157px)]">
-        <ConversationContent className="mx-auto md:max-w-3xl">
-          {isLoading ? (
-            // when going to the single chat page and fetching the previous messages/history of the chat
-            <LoadingMessages />
-          ) : messages.length === 0 ? (
-            <Greeting />
-          ) : (
-            // Preview Message
-            messages.map((message, index) => (
-              <PreviewMessage
-                key={message.id}
-                message={message}
-                isLoading={
-                  status === "streaming" && messages.length - 1 === index
-                }
-              />
-            ))
-          )}
-
-          {status === "submitted" &&
-            messages.length &&
-            messages.at(-1)?.role === "user" && (
-              <RiCircleFill className="w-4 h-4 animate-bounce" />
+    <div className="overflow-auto" ref={scrollRef}>
+      <div ref={contentRef}>
+        <Conversation className="min-h-[calc(100vh-157px)]">
+          <ConversationContent className="mx-auto md:max-w-3xl">
+            {isLoading ? (
+              // when going to the single chat page and fetching the previous messages/history of the chat
+              <LoadingMessages />
+            ) : messages.length === 0 ? (
+              <Greeting />
+            ) : (
+              // Preview Message
+              messages.map((message, index) => (
+                <PreviewMessage
+                  key={message.id}
+                  message={message}
+                  isLoading={
+                    status === "streaming" && messages.length - 1 === index
+                  }
+                />
+              ))
             )}
 
-          {status === "streaming" &&
-            messages.length &&
-            messages.at(-1)?.role === "assistant" && (
-              <ThreeDotsAnimation size={8} />
-            )}
+            {status === "submitted" &&
+              messages.length &&
+              messages.at(-1)?.role === "user" && (
+                <RiCircleFill className="w-4 h-4 animate-bounce" />
+              )}
 
-          {status === "error" && error && (
-            <ErrorAlert title="Chat Error" description={error.message} />
-          )}
-        </ConversationContent>
-      </Conversation>
+            {status === "streaming" &&
+              messages.length &&
+              messages.at(-1)?.role === "assistant" && (
+                <ThreeDotsAnimation size={8} />
+              )}
+
+            {status === "error" && error && (
+              <ErrorAlert title="Chat Error" description={error.message} />
+            )}
+          </ConversationContent>
+        </Conversation>
+      </div>
     </div>
   );
 };
