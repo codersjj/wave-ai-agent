@@ -15,10 +15,10 @@ export const ToolNameEnum = {
 export type ToolNameType = (typeof ToolNameEnum)[keyof typeof ToolNameEnum];
 
 export const ToolTypeEnum = {
-  CreateNote: "tool-createNote",
-  SearchNote: "tool-searchNote",
-  WebSearch: "tool-webSearch",
-  ExtractWebUrl: "tool-extractWebUrl",
+  CreateNote: `tool-${ToolNameEnum.CreateNote}`,
+  SearchNote: `tool-${ToolNameEnum.SearchNote}`,
+  WebSearch: `tool-${ToolNameEnum.WebSearch}`,
+  ExtractWebUrl: `tool-${ToolNameEnum.ExtractWebUrl}`,
 } as const;
 
 export type ToolType = (typeof ToolTypeEnum)[keyof typeof ToolTypeEnum];

@@ -17,18 +17,6 @@ interface PreviewMessageProps {
   isLoading: boolean;
 }
 
-type TextOnlyMessage = Omit<UIMessage, "parts"> & { parts: TextUIPart[] };
-
-function getLastTextPart(message: UIMessage): TextUIPart | null {
-  const part = message.parts.at(-1);
-  return part && isTextUIPart(part) ? part : null;
-}
-
-function getLastText(message: UIMessage): string | null {
-  const p = getLastTextPart(message);
-  return p ? p.text : null;
-}
-
 const PreviewMessage = React.memo(
   ({ message, isLoading }: PreviewMessageProps) => {
     // const { theme } = useTheme()
@@ -67,13 +55,23 @@ const PreviewMessage = React.memo(
                 );
 
               case ToolTypeEnum.CreateNote:
-                return <ToolCall key={`${id}-tool-${index}`} />;
               case ToolTypeEnum.SearchNote:
-                return <ToolCall key={`${id}-tool-${index}`} />;
               case ToolTypeEnum.WebSearch:
-                return <ToolCall key={`${id}-tool-${index}`} />;
               case ToolTypeEnum.ExtractWebUrl:
-                return <ToolCall key={`${id}-tool-${index}`} />;
+                const { input, state, toolCallId, type, output, errorText } =
+                  part;
+                return (
+                  <ToolCall
+                    key={toolCallId}
+                    toolCallId={toolCallId}
+                    type={type}
+                    input={input}
+                    state={state}
+                    output={output}
+                    errorText={errorText}
+                    isLoading={isLoading}
+                  />
+                );
 
               default:
                 return null;
