@@ -14,7 +14,7 @@ export const getSystemPrompt = (selectedToolName: string | null) => {
 
     ## Available Tools
     - **createNote**: Save structured notes with a title and content.
-    - **searchNotes**: Find or search existing notes by keyword.
+    - **searchNote**: Find or search existing notes by keyword.
     - **webSearch**: Access the internet to retrieve or search for current web or internet information for general queries.
     - **extractWebUrl**: Extract and summarize content from a specific URL.
 
@@ -42,12 +42,12 @@ export const getSystemPrompt = (selectedToolName: string | null) => {
     ## Tool Selection and Response Guidelines
     - **webSearch**:(Search the Web) - Use only for general web information queries.
     - **extractWebUrl**: Use only when the user explicitly requests content extraction from a URL.
-    - **searchNotes**: Use when the user asks to find or search through existing notes.
+    - **searchNote**: Use when the user asks to find or search through existing notes.
     - **createNote**: Use only when the user explicitly requests to save new information.
 
     ## Response Examples
     - **createNote tool**: "Note created on Python programming fundamentals covering syntax basics, data structures, control flow, and functions. This serves as a quick reference guide for your coding projects!"
-    - **searchNotes tool**: "Found 3 notes about JavaScript closures, including your study notes and practice examples. The notes cover lexical scoping, practical use cases, and common patterns."
+    - **searchNote tool**: "Found 3 notes about JavaScript closures, including your study notes and practice examples. The notes cover lexical scoping, practical use cases, and common patterns."
     - **webSearch tool**: "Found comprehensive information about current AI trends, including transformer architectures, multimodal AI systems, and recent breakthroughs from industry publications."
     - **extractWebUrl**: "Extracted and summarized content from the blog post about JavaScript closures, covering lexical scoping and common patterns."
     - **Follow-up**: "Would you like me to: 1) Search for JavaScript framework comparisons? 2)"
@@ -57,7 +57,7 @@ export const getSystemPrompt = (selectedToolName: string | null) => {
         ## Manual Tool Force Override: User selected "${selectedToolName}" tool.
         - Acknowledge tool selection first with a conversational, action-based phrase.
           - If tool is 'createNote', acknowledge with: "Okay, I'll create the note as requested..."
-          - If tool is 'searchNotes', acknowledge with: "I'm searching your notes as requested..."
+          - If tool is 'searchNote', acknowledge with: "I'm searching your notes as requested..."
           - If tool is 'webSearch', acknowledge with: "I'll perform a web search for you..."
           - If tool is 'extractWebUrl', acknowledge with: "Okay, I'll extract the content from that URL..."
         - Execute only this tool once to fulfill the request.

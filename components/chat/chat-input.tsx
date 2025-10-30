@@ -35,11 +35,10 @@ interface ChatInputProps {
   chatId: string;
   input: string;
   className?: string;
-  messages: UIMessage[];
   status: ChatStatus;
   initialModelId: string;
+  disabled?: boolean;
   setInput: Dispatch<SetStateAction<string>>;
-  setMessages: UseChatHelpers<UIMessage>["setMessages"];
   sendMessage: UseChatHelpers<UIMessage>["sendMessage"];
   stop: () => Promise<void>;
 }
@@ -48,14 +47,14 @@ const ChatInput = ({
   chatId,
   input,
   className,
-  messages,
   status,
   initialModelId,
+  disabled,
   setInput,
-  setMessages,
   sendMessage,
   stop,
 }: ChatInputProps) => {
+  console.log("🚀 ~ ChatInput ~ chatId:", chatId);
   const { localModelId, setLocalModelId } = useLocalChat();
   const [toolsOpen, setToolsOpen] = useState<boolean>(false);
   const [selectedTool, setSelectedTool] = useState<AvailableToolType | null>(
@@ -83,6 +82,8 @@ const ChatInput = ({
 
   const handleSubmit = useCallback(
     (message: PromptInputMessage) => {
+      if (disabled) return;
+
       if (!input.trim()) {
         toast.error("Please type a message");
         return;
@@ -99,6 +100,13 @@ const ChatInput = ({
         );
         return;
       }
+
+      // 仅更新浏览器地址栏（不触发 Next.js 的路由导航或重新渲染）
+      // Use window.history.replaceState to change the displayed URL without
+      // causing Next.js to perform navigation. If you want the app router to
+      // handle the route change (and possibly reload layouts/data), use
+      // next/navigation's router.push or router.replace instead.
+      window.history.replaceState({}, "", `/chat/${chatId}`);
 
       sendMessage(
         {
@@ -121,6 +129,7 @@ const ChatInput = ({
       setInput("");
     },
     [
+      disabled,
       input,
       chatId,
       isGenerating,
@@ -225,7 +234,7 @@ const ChatInput = ({
           ) : (
             <PromptInputSubmit
               className="absolute right-4 bottom-3.5 rounded-full cursor-pointer disabled:pointer-events-auto disabled:cursor-not-allowed"
-              disabled={!input.trim()}
+              disabled={!input.trim() || disabled}
               status={status}
             >
               <ArrowUpIcon className="size-6" />

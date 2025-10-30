@@ -7,6 +7,7 @@ import { generateUUID } from "@/lib/utils";
 import { DEFAULT_MODEL_ID } from "@/lib/ai/models";
 import ChatInput from "./chat-input";
 import { toast } from "sonner";
+import ChatMessages from "./chat-messages";
 
 interface ChatInterfaceProps {
   chatId: string;
@@ -48,7 +49,7 @@ const ChatInterface = ({
       onFinish: () => {},
       onError: (error) => {
         console.log("Chat error:", error);
-        toast.error(error instanceof Error ? error.message : "useChat error");
+        // toast.error(error instanceof Error ? error.message : "useChat error");
       },
     });
 
@@ -59,23 +60,41 @@ const ChatInterface = ({
   }, [initialMessages, setMessages]);
 
   if (onlyInput) {
-    return <div className="relative w-full">{/* Chat Input */}</div>;
+    return (
+      <div className="relative w-full min-h-32">
+        <ChatInput
+          chatId={chatId}
+          input={input}
+          status={status}
+          initialModelId={DEFAULT_MODEL_ID}
+          disabled={inputDisabled}
+          setInput={setInput}
+          sendMessage={sendMessage}
+          stop={stop}
+        />
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col h-screen bg-background overflow-auto">
       {/* Chat Messages */}
-      <div className="h-screen"></div>
+      <ChatMessages
+        chatId={chatId}
+        messages={messages}
+        status={status}
+        error={error}
+        isLoading={initialLoading}
+      />
 
       <div className="sticky bottom-1 mx-auto px-4 pb-1 w-full md:max-w-3xl bg-background">
         <ChatInput
           chatId={chatId}
           input={input}
-          messages={messages}
           status={status}
           initialModelId={DEFAULT_MODEL_ID}
+          disabled={inputDisabled}
           setInput={setInput}
-          setMessages={setMessages}
           sendMessage={sendMessage}
           stop={stop}
         />
