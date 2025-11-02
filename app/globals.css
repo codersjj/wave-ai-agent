@@ -172,3 +172,18 @@
     translate: 0 0;
   }
 }
+
+.animate-progress-bar {
+  width: 50%;
+  animation: progress-bar 2s linear infinite;
+}
+
+@keyframes progress-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
+}
