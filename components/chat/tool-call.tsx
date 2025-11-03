@@ -121,7 +121,7 @@ const toolOutputRenders: Record<
   },
   [ToolTypeEnum.WebSearch]: (input, output) => (
     <ToolSearchExtractPreview
-      type={ToolTypeEnum.SearchNote}
+      type={ToolTypeEnum.WebSearch}
       input={input}
       output={output}
     />
