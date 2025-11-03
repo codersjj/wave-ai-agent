@@ -10,6 +10,10 @@ import {
 } from "../ui/collapsible";
 import { cn } from "@/lib/utils";
 import { ToolTypeEnum } from "@/lib/ai/tools/constant";
+import ToolNoteCardPreview from "./tool-note-card-preview";
+import useNoteId from "@/hooks/use-note-id";
+import ToolNoteItemPreview from "./tool-note-item-preview";
+import ToolSearchExtractPreview from "./tool-search-extract-preview";
 
 interface ToolCallProps {
   toolCallId: string;
@@ -87,6 +91,51 @@ const ToolHeader = React.memo(
 
 ToolHeader.displayName = "ToolHeader";
 
+const toolOutputRenders: Record<
+  ToolUIPart["type"],
+  (input: any, output: any) => React.ReactNode
+> = {
+  [ToolTypeEnum.CreateNote]: (_, output) => {
+    const { id, title, content } = output?.data ?? {};
+    return (
+      <div className="my-1 bg-amber-50">
+        <ToolNoteCardPreview noteId={id} title={title} content={content} />
+      </div>
+    );
+  },
+  [ToolTypeEnum.SearchNote]: (input, output) => {
+    const { setNoteId } = useNoteId();
+    const notes = output?.notes ?? [];
+
+    return (
+      <div className="border border-border/40 rounded-lg px-1.5 py-3">
+        <p>{JSON.stringify(input, null, 2)}</p>
+        <ul className="flex flex-col gap-1">
+          {notes.map((note: any) => (
+            <li key={note.id} onClick={() => setNoteId(note.id)}>
+              <ToolNoteItemPreview />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  },
+  [ToolTypeEnum.WebSearch]: (input, output) => (
+    <ToolSearchExtractPreview
+      type={ToolTypeEnum.SearchNote}
+      input={input}
+      output={output}
+    />
+  ),
+  [ToolTypeEnum.ExtractWebUrl]: (input, output) => (
+    <ToolSearchExtractPreview
+      type={ToolTypeEnum.ExtractWebUrl}
+      input={input}
+      output={output}
+    />
+  ),
+};
+
 const ToolCall = ({
   toolCallId,
   type,
@@ -100,6 +149,23 @@ const ToolCall = ({
 
   const { icon, text } = getToolStatus(toolName, state, output);
 
+  const renderOutput = () => {
+    if (state === "output-available") {
+      const render = toolOutputRenders[type];
+      return render ? (
+        render(input, output)
+      ) : (
+        <div className="mt-2">{JSON.stringify(output)}</div>
+      );
+    }
+
+    if (state === "output-error") {
+      return <div className="text-destructive">{errorText}</div>;
+    }
+
+    return null;
+  };
+
   if (
     isLoading &&
     (state === "input-streaming" || state === "input-available")
@@ -110,27 +176,21 @@ const ToolCall = ({
   if (type === ToolTypeEnum.CreateNote) {
     return (
       <>
-        <ToolHeader
-          collapsible={false}
-          icon={icon}
-          title={toolName}
-          type={type}
-        />
-        <div>{/* Output */}</div>
+        <ToolHeader collapsible={false} icon={icon} title={text} type={type} />
+        <div>{renderOutput()}</div>
       </>
     );
   }
 
   return (
-    <Collapsible defaultOpen className="group">
-      <ToolHeader collapsible icon={icon} title={toolName} type={type} />
+    <Collapsible defaultOpen className="group mb-3">
+      <ToolHeader collapsible icon={icon} title={text} type={type} />
       <CollapsibleContent
         className="data-[state=open]:fade-in data-[state=closed]:fade-out-0
           data-[state=open]:slide-in-from-top-2 data-[state=closed]:slide-out-to-top-2
           data-[state=open]:animate-in data-[state=closed]:animate-out duration-300"
       >
-        {/* Output */}
-        content
+        {renderOutput()}
       </CollapsibleContent>
     </Collapsible>
   );
