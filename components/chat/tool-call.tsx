@@ -104,16 +104,15 @@ const toolOutputRenders: Record<
     );
   },
   [ToolTypeEnum.SearchNote]: (input, output) => {
-    const { setNoteId } = useNoteId();
     const notes = output?.notes ?? [];
 
     return (
       <div className="border border-border/40 rounded-lg px-1.5 py-3">
-        <p>{JSON.stringify(input, null, 2)}</p>
-        <ul className="flex flex-col gap-1">
+        <p className="mb-2 text-sm">{`Searched for "${input?.query}"`}</p>
+        <ul className="flex flex-col gap-1 pt-2 max-h-48 overflow-y-auto">
           {notes.map((note: any) => (
-            <li key={note.id} onClick={() => setNoteId(note.id)}>
-              <ToolNoteItemPreview />
+            <li key={note.id}>
+              <ToolNoteItemPreview noteId={note.id} title={note.title} />
             </li>
           ))}
         </ul>
