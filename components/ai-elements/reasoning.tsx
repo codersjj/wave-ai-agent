@@ -36,6 +36,8 @@ export type ReasoningProps = ComponentProps<typeof Collapsible> & {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   duration?: number;
+  reasoningIndex?: number; // 新增：reasoning part 在 parts 数组中的索引
+  onThinkingDurationChange?: (index: number, duration: number) => void; // 新增：回调函数
 };
 
 const AUTO_CLOSE_DELAY = 1000;
@@ -49,6 +51,8 @@ export const Reasoning = memo(
     defaultOpen = true,
     onOpenChange,
     duration: durationProp,
+    reasoningIndex, // 新增
+    onThinkingDurationChange, // 新增
     children,
     ...props
   }: ReasoningProps) => {
@@ -64,6 +68,7 @@ export const Reasoning = memo(
 
     const [hasAutoClosed, setHasAutoClosed] = useState(false);
     const [startTime, setStartTime] = useState<number | null>(null);
+    const [hasSavedDuration, setHasSavedDuration] = useState(false);
 
     // Track duration when streaming starts and ends
     useEffect(() => {
@@ -72,10 +77,31 @@ export const Reasoning = memo(
           setStartTime(Date.now());
         }
       } else if (startTime !== null) {
-        setDuration(Math.ceil((Date.now() - startTime) / MS_IN_S));
+        const calculatedDuration = Math.ceil(
+          (Date.now() - startTime) / MS_IN_S
+        );
+        setDuration(calculatedDuration);
         setStartTime(null);
+
+        // 当 duration 计算完成且尚未保存时，触发保存
+        if (
+          calculatedDuration > 0 &&
+          !hasSavedDuration &&
+          onThinkingDurationChange &&
+          reasoningIndex !== undefined
+        ) {
+          onThinkingDurationChange(reasoningIndex, calculatedDuration);
+          setHasSavedDuration(true);
+        }
       }
-    }, [isStreaming, startTime, setDuration]);
+    }, [
+      isStreaming,
+      startTime,
+      setDuration,
+      onThinkingDurationChange,
+      reasoningIndex,
+      hasSavedDuration,
+    ]);
 
     // Auto-open when streaming starts, auto-close when streaming ends (once only)
     useEffect(() => {

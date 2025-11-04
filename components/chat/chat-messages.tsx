@@ -10,7 +10,7 @@ import PreviewMessage from "./preview-message";
 import ThreeDotsAnimation from "../ui/three-dots-animation";
 
 interface ChatMessagesProps {
-  chatId?: string;
+  chatId: string;
   messages: UIMessage[];
   status: ChatStatus;
   error?: Error;
@@ -24,7 +24,6 @@ const ChatMessages = ({
   error,
   isLoading,
 }: ChatMessagesProps) => {
-  console.log("🚀 ~ ChatMessages ~ messages:", messages);
   // see: https://github.com/stackblitz-labs/use-stick-to-bottom?tab=readme-ov-file#usesticktobottom-hook
   const { scrollRef, contentRef } = useStickToBottom();
 
@@ -44,6 +43,7 @@ const ChatMessages = ({
                 <PreviewMessage
                   key={message.id}
                   message={message}
+                  chatId={chatId}
                   isLoading={
                     status === "streaming" && messages.length - 1 === index
                   }

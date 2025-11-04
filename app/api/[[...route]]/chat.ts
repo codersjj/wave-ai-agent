@@ -37,6 +37,20 @@ const chatIdSchema = z.object({
   id: z.string().min(1),
 });
 
+const updateMessagePartsSchema = z.object({
+  parts: z.any(), // JSON 类型，包含更新后的 parts
+});
+
+const messageIdSchema = z.object({
+  messageId: z.string().min(1),
+});
+
+// 用于流结束后一次性写入最终 parts（含 UI duration）
+const finalizeMessageSchema = z.object({
+  chatId: z.string().min(1),
+  parts: z.any(),
+});
+
 export const chatApp = new Hono()
   .post(
     "/",
@@ -77,7 +91,9 @@ export const chatApp = new Hono()
             createdAt: "asc",
           },
         });
+        console.log("🚀 ~ messagesFromDB:", messagesFromDB);
 
+        // parts 直接从数据库读取，如果之前保存过 duration，会自动包含
         const mappedUIMessages = messagesFromDB.map(
           ({ id, role, parts, chatId, createdAt, updatedAt }) => ({
             id,
@@ -94,6 +110,7 @@ export const chatApp = new Hono()
 
         // add new message
         const newUIMessages = [...mappedUIMessages, message];
+        console.log("🚀 ~ newUIMessages:", newUIMessages);
 
         const modelMessages = convertToModelMessages(newUIMessages);
 
@@ -146,22 +163,84 @@ export const chatApp = new Hono()
             console.log("completed messages length", messages.length);
             console.log("responseMessage", responseMessage);
             try {
-              await prisma.message.createMany({
-                data: messages.map((m) => ({
-                  id: m.id || generateUUID(),
-                  role: m.role,
-                  parts: JSON.parse(JSON.stringify(m.parts)),
-                  chatId: id,
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                })),
-                skipDuplicates: true,
-              });
+              // 仅持久化非 assistant 的消息（如 tool 调用等）
+              // assistant 最终消息交由前端 finalize 接口一次性写入，避免重复
+              const nonAssistantMessages = messages.filter(
+                (m) => m.role !== "assistant"
+              );
+              if (nonAssistantMessages.length > 0) {
+                await prisma.message.createMany({
+                  data: nonAssistantMessages.map((m) => ({
+                    id: m.id || generateUUID(),
+                    role: m.role,
+                    parts: JSON.parse(JSON.stringify(m.parts)),
+                    chatId: id,
+                    // 删除 createdAt 和 updatedAt，让数据库自动设置
+                  })),
+                  skipDuplicates: true,
+                });
+              }
+
+              // // 在流结束时，确保将最终的 assistant parts 一并写入（含 reasoning 等元信息）
+              // if (responseMessage?.id) {
+              //   await prisma.message.upsert({
+              //     where: { id: responseMessage.id },
+              //     update: {
+              //       parts: JSON.parse(JSON.stringify(responseMessage.parts)),
+              //     },
+              //     create: {
+              //       id: responseMessage.id,
+              //       role: responseMessage.role,
+              //       parts: JSON.parse(JSON.stringify(responseMessage.parts)),
+              //       chatId: id,
+              //     },
+              //   });
+              // }
             } catch (error) {
               console.log("toUIMessageStreamResponse onFinish error:", error);
             }
           },
         });
+      } catch (error) {
+        if (error instanceof HTTPException) {
+          throw error;
+        }
+        throw new HTTPException(500, { message: "Internal Server Error" });
+      }
+    }
+  )
+  .post(
+    "/message/:messageId/finalize",
+    zValidator("param", messageIdSchema),
+    zValidator("json", finalizeMessageSchema),
+    getAuthUserMiddleware,
+    async (c) => {
+      try {
+        const { messageId } = c.req.valid("param");
+        const { chatId, parts } = c.req.valid("json");
+        const user = c.get("user");
+
+        // 校验 chat 属于当前用户
+        const chat = await prisma.chat.findFirst({
+          where: { id: chatId, userId: user.id },
+        });
+        if (!chat) {
+          throw new HTTPException(404, { message: "Chat not found" });
+        }
+
+        // upsert 最终的 assistant 消息 parts
+        const saved = await prisma.message.upsert({
+          where: { id: messageId },
+          update: { parts: JSON.parse(JSON.stringify(parts)) },
+          create: {
+            id: messageId,
+            role: "assistant",
+            parts: JSON.parse(JSON.stringify(parts)),
+            chatId,
+          },
+        });
+
+        return c.json({ success: true, data: saved });
       } catch (error) {
         if (error instanceof HTTPException) {
           throw error;
