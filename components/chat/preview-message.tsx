@@ -11,6 +11,7 @@ import {
 } from "../ai-elements/reasoning";
 import { ToolTypeEnum } from "@/lib/ai/tools/constant";
 import ToolCall from "./tool-call";
+import MessageActions from "./message-actions";
 
 interface PreviewMessageProps {
   message: UIMessage;
@@ -23,7 +24,13 @@ const PreviewMessage = React.memo(
     const { id, role, parts } = message;
 
     return (
-      <Message from={role} key={id}>
+      <Message
+        from={role}
+        key={id}
+        className={`flex flex-col gap-2 ${
+          message.role === "assistant" ? "items-start" : "items-end"
+        }`}
+      >
         <MessageContent
           className={cn(
             "text-[15.5px] dark:text-white",
@@ -78,6 +85,7 @@ const PreviewMessage = React.memo(
             }
           })}
         </MessageContent>
+        <MessageActions message={message} isLoading={isLoading} />
       </Message>
     );
   }

@@ -8,6 +8,7 @@ import prisma from "@/lib/prisma";
 const noteSchema = z.object({
   title: z.string().min(1),
   content: z.string(),
+  from: z.string().optional(),
 });
 
 const noteIdSchema = z.object({
@@ -193,14 +194,14 @@ export const noteApp = new Hono()
     getAuthUserMiddleware,
     async (c) => {
       try {
-        const { id } = c.req.valid('param')
-        const user = c.get('user')
+        const { id } = c.req.valid("param");
+        const user = c.get("user");
         const note = await prisma.note.findFirst({
           where: {
             id,
-            userId: user.id
-          }
-        })
+            userId: user.id,
+          },
+        });
 
         if (!note) {
           throw new HTTPException(404, { message: "Note not found" });
@@ -208,8 +209,8 @@ export const noteApp = new Hono()
 
         return c.json({
           success: true,
-          data: note
-        })
+          data: note,
+        });
       } catch (error) {
         if (error instanceof HTTPException) {
           throw error;

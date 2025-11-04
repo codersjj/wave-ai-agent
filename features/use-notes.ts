@@ -43,10 +43,13 @@ export const useCreateNote = () => {
       //   });
       // });
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data, variables) => {
       const noteId = data.data.id;
       setNoteId(noteId);
-      toast.success("Note created successfully");
+      const from = variables.from;
+      if (from !== "chat") {
+        toast.success("Note created successfully");
+      }
       await queryClient.invalidateQueries({
         queryKey: ["notes"],
         refetchType: "all",
