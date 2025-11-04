@@ -207,7 +207,7 @@ export const chatApp = new Hono()
           },
           include: {
             messages: {
-              orderBy: { createdAt: "desc" },
+              orderBy: { createdAt: "asc" },
             },
           },
         });
