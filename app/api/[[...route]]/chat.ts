@@ -7,7 +7,11 @@ import {
   UIMessagePart,
 } from "ai";
 import z from "zod";
-import { ChatModel, DEVELOPMENT_CHAT_MODEL } from "@/lib/ai/models";
+import {
+  ChatModel,
+  DEVELOPMENT_CHAT_MODEL,
+  IS_THINKING,
+} from "@/lib/ai/models";
 import { zValidator } from "@hono/zod-validator";
 import { getAuthUserMiddleware } from "@/lib/hono/middleware";
 import prisma from "@/lib/prisma";
@@ -135,7 +139,7 @@ export const chatApp = new Hono()
               // see: https://ai.google.dev/gemini-api/docs/thinking
               thinkingConfig: {
                 thinkingBudget: 1024,
-                includeThoughts: true,
+                includeThoughts: IS_THINKING,
               },
             },
           },
@@ -163,14 +167,18 @@ export const chatApp = new Hono()
             console.log("completed messages length", messages.length);
             console.log("responseMessage", responseMessage);
             try {
-              // 仅持久化非 assistant 的消息（如 tool 调用等）
+              // IS_THINKING 为 true 时，仅持久化非 assistant 的消息（如 tool 调用等）
               // assistant 最终消息交由前端 finalize 接口一次性写入，避免重复
-              const nonAssistantMessages = messages.filter(
-                (m) => m.role !== "assistant"
-              );
-              if (nonAssistantMessages.length > 0) {
+              let msgs = messages;
+              if (IS_THINKING) {
+                const nonAssistantMessages = messages.filter(
+                  (m) => m.role !== "assistant"
+                );
+                msgs = nonAssistantMessages;
+              }
+              if (msgs.length > 0) {
                 await prisma.message.createMany({
-                  data: nonAssistantMessages.map((m) => ({
+                  data: msgs.map((m) => ({
                     id: m.id || generateUUID(),
                     role: m.role,
                     parts: JSON.parse(JSON.stringify(m.parts)),

@@ -34,3 +34,5 @@ export const MODEL_OPTIONS = chatModels.map((model) => ({
   value: model.id,
   label: model.name,
 }));
+
+export const IS_THINKING = true;
