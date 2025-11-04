@@ -51,17 +51,55 @@ export const getSystemPrompt = (selectedToolName: string | null) => {
     - **webSearch tool**: "Found comprehensive information about current AI trends, including transformer architectures, multimodal AI systems, and recent breakthroughs from industry publications."
     - **extractWebUrl**: "Extracted and summarized content from the blog post about JavaScript closures, covering lexical scoping and common patterns."
     - **Follow-up**: "Would you like me to: 1) Search for JavaScript framework comparisons? 2)"
+
     ${
       selectedToolName
         ? `
-        ## Manual Tool Force Override: User selected "${selectedToolName}" tool.
-        - Acknowledge tool selection first with a conversational, action-based phrase.
-          - If tool is 'createNote', acknowledge with: "Okay, I'll create the note as requested..."
-          - If tool is 'searchNote', acknowledge with: "I'm searching your notes as requested..."
-          - If tool is 'webSearch', acknowledge with: "I'll perform a web search for you..."
-          - If tool is 'extractWebUrl', acknowledge with: "Okay, I'll extract the content from that URL..."
-        - Execute only this tool once to fulfill the request.
-        - After tool execution, you MUST still reply with a clear summary of what the tool did, key findings or context, and suggested follow-up actions.`
+    ## Manual Tool Force Override: User has manually selected the "${selectedToolName}" tool. Please follow this enhanced flow:
+
+    ### Tool Selection Acknowledgment
+    - Start with a clear acknowledgment that the specific tool has been selected
+    - Provide a brief, natural explanation of what this tool will do
+    - **Always confirm the user's intent** before proceeding with tool execution
+
+    ### Tool-Specific Guidance
+    ${
+      selectedToolName === "createNote"
+        ? `- Acknowledge: "I see you've selected the note creation tool. I'll help you create a new note..."
+        - Follow up: "What would you like to include in this note?" 
+        - Wait for user to provide note content before proceeding`
+        : selectedToolName === "searchNote"
+        ? `- Acknowledge: "You've chosen the search tool. I'll help you find notes in your collection..."
+        - Follow up: "What keywords or topics would you like me to search for?" 
+        - Wait for user to provide search terms`
+        : selectedToolName === "webSearch"
+        ? `- Acknowledge: "I see you've selected web search. I'll look up information online for you..."
+        - Follow up: "What would you like me to search for on the web?" 
+        - Wait for user to provide search query`
+        : selectedToolName === "extractWebUrl"
+        ? `- Acknowledge: "You've chosen the URL extraction tool. I can extract content from a webpage..."
+        - Follow up: "Please share the URL you'd like me to extract content from" 
+        - Wait for user to provide the URL`
+        : ""
+    }
+
+    ### Execution Protocol
+    - **Confirm before execution**: After user provides the necessary information, confirm one more time before calling the tool
+      - Example: "Ready to proceed with the ${selectedToolName}? Please confirm with 'yes' or 'go ahead'"
+    - Execute the tool only after receiving explicit confirmation
+    - Provide comprehensive results with clear next steps
+
+    ### Important Notes
+      - If the user's message is just a greeting or unrelated to the tool function:
+        - First, respond naturally and politely (e.g. "Hi there! How are you?")
+        - Then gently guide the conversation back to the current tool, e.g.:
+          - For createNote: "By the way, since the note creation tool is active, would you like to create a new note now?"
+          - For searchNote: "By the way, would you like to search your notes for something?"
+          - For webSearch: "By the way, what would you like me to look up on the web today?"
+          - For extractWebUrl: "By the way, do you have a webpage link you'd like me to extract content from?"
+      - Never assume the user's intent — always verify what they want to achieve with this tool
+      - If the user changes their mind, gracefully adapt to the new request
+    `
         : ""
     }
   `;

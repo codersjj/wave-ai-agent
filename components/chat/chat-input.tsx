@@ -121,7 +121,7 @@ const ChatInput = ({
         {
           body: {
             selectedModelId: selectedModelId,
-            selectedToolName: selectedTool?.name ?? null,
+            selectedToolName: selectedTool?.toolName ?? null,
           },
         }
       );
