@@ -1,8 +1,9 @@
 import { RiEmotionHappyFill } from "@remixicon/react";
 import Header from "../../_common/header";
 import RecentNotes from "./recent-notes";
+import ChatInterface from "@/components/chat";
 
-const MainSection = () => {
+const MainSection = ({ id }: { id: string }) => {
   return (
     <>
       <Header />
@@ -20,11 +21,20 @@ const MainSection = () => {
         </div>
 
         {/* Chat Interface */}
+        <ChatInterface
+          className="mt-4 px-4"
+          // see: https://react.dev/reference/react/useState#resetting-state-with-a-key
+          key={id}
+          chatId={id}
+          initialMessages={[]}
+          initialLoading={false}
+          onlyInput
+        />
 
-        <div className="w-full pt-7">
-          {/* <div>
+        <div className="w-full pt-4">
+          <div className="pl-4">
             <span className="text-sm dark:text-white/50">Recent Notes</span>
-          </div> */}
+          </div>
           {/* Recent Notes */}
           <RecentNotes />
         </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { DefaultChatTransport, UIMessage } from "ai";
 import { useChat } from "@ai-sdk/react";
-import { generateUUID } from "@/lib/utils";
+import { cn, generateUUID } from "@/lib/utils";
 import { DEFAULT_MODEL_ID } from "@/lib/ai/models";
 import ChatInput from "./chat-input";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ interface ChatInterfaceProps {
   initialLoading: boolean;
   onlyInput?: boolean;
   inputDisabled?: boolean;
+  className?: string;
 }
 
 const ChatInterface = ({
@@ -23,6 +24,7 @@ const ChatInterface = ({
   initialLoading,
   onlyInput = false,
   inputDisabled,
+  className,
 }: ChatInterfaceProps) => {
   const [input, setInput] = useState<string>("");
 
@@ -61,7 +63,7 @@ const ChatInterface = ({
 
   if (onlyInput) {
     return (
-      <div className="relative w-full min-h-32">
+      <div className={cn("relative w-full min-h-32", className)}>
         <ChatInput
           chatId={chatId}
           input={input}
