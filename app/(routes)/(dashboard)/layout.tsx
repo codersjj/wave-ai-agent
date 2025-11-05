@@ -8,6 +8,7 @@ import AppSidebar from "@/components/sidebar";
 import { auth } from "@/lib/auth"; // path to your Better Auth server instance
 import MainContent from "./_common/main-content";
 import NoteDialog from "@/components/note-dialog";
+import ChatHistory from "./_common/chat-history";
 
 export default async function DashboardLayout({
   children,
@@ -40,6 +41,7 @@ export default async function DashboardLayout({
           // className="relative overflow-x-hidden pt-0"
           >
             <MainContent>{children}</MainContent>
+            <ChatHistory />
             <NoteDialog />
           </SidebarInset>
         </SidebarProvider>

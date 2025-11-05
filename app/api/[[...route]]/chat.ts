@@ -158,7 +158,8 @@ export const chatApp = new Hono()
         return result.toUIMessageStreamResponse({
           sendSources: true,
           sendReasoning: true,
-          originalMessages: newUIMessages,
+          // originalMessages: newUIMessages,
+          generateMessageId: generateUUID,
           onFinish: async (event) => {
             const { messages, responseMessage } = event;
             console.log("completed messages length", messages.length);
@@ -176,7 +177,7 @@ export const chatApp = new Hono()
               if (msgs.length > 0) {
                 await prisma.message.createMany({
                   data: msgs.map((m) => ({
-                    id: m.id || generateUUID(),
+                    id: m.id,
                     role: m.role,
                     parts: JSON.parse(JSON.stringify(m.parts)),
                     chatId: id,

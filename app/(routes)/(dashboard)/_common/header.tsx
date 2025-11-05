@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { RiAddLine, RiHistoryLine } from "@remixicon/react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { RiAddLine, RiHistoryLine } from "@remixicon/react";
+import { useLocalChat } from "@/hooks/use-local-chat";
 
 interface HeaderProps {
   title?: string;
@@ -16,6 +17,8 @@ const Header = ({ title, showActions }: HeaderProps) => {
   const router = useRouter();
 
   const handleNewChatClick = () => router.push("/chat");
+
+  const { onToggleHistory } = useLocalChat();
 
   return (
     <header
@@ -60,6 +63,7 @@ const Header = ({ title, showActions }: HeaderProps) => {
             variant="ghost"
             size="sm"
             className="h-8 gap-1 cursor-pointer"
+            onClick={onToggleHistory}
           >
             <RiHistoryLine className="size-4" />
             <span className="hidden sm:inline">Chat History</span>
