@@ -1,11 +1,13 @@
 import ChatInterface from "@/components/chat";
 import { generateUUID } from "@/lib/utils";
+import Header from "../_common/header";
 
 const Chat = () => {
   const id = generateUUID();
 
   return (
     <div>
+      <Header showActions />
       <ChatInterface
         // see: https://react.dev/reference/react/useState#resetting-state-with-a-key
         key={id}

@@ -79,7 +79,7 @@ const ChatInterface = ({
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background overflow-auto">
+    <div className="flex flex-col pt-10 h-screen bg-background overflow-auto">
       {/* Chat Messages */}
       <ChatMessages
         chatId={chatId}
