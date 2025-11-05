@@ -7,11 +7,7 @@ import {
   UIMessagePart,
 } from "ai";
 import z from "zod";
-import {
-  ChatModel,
-  DEVELOPMENT_CHAT_MODEL,
-  IS_THINKING,
-} from "@/lib/ai/models";
+import { ChatModel, DEVELOPMENT_CHAT_MODEL } from "@/lib/ai/models";
 import { zValidator } from "@hono/zod-validator";
 import { getAuthUserMiddleware } from "@/lib/hono/middleware";
 import prisma from "@/lib/prisma";
@@ -35,6 +31,7 @@ const chatSchema = z.object({
   }),
   selectedModelId: z.string() as z.ZodType<ChatModel["id"]>,
   selectedToolName: z.string().nullable(),
+  isDeepThink: z.boolean().optional().default(false),
 });
 
 const chatIdSchema = z.object({
@@ -63,7 +60,7 @@ export const chatApp = new Hono()
     async (c) => {
       try {
         const user = c.get("user");
-        const { id, message, selectedModelId, selectedToolName } =
+        const { id, message, selectedModelId, selectedToolName, isDeepThink } =
           c.req.valid("json");
 
         // find the chat data
@@ -95,7 +92,6 @@ export const chatApp = new Hono()
             createdAt: "asc",
           },
         });
-        console.log("🚀 ~ messagesFromDB:", messagesFromDB);
 
         // parts 直接从数据库读取，如果之前保存过 duration，会自动包含
         const mappedUIMessages = messagesFromDB.map(
@@ -114,7 +110,6 @@ export const chatApp = new Hono()
 
         // add new message
         const newUIMessages = [...mappedUIMessages, message];
-        console.log("🚀 ~ newUIMessages:", newUIMessages);
 
         const modelMessages = convertToModelMessages(newUIMessages);
 
@@ -132,14 +127,16 @@ export const chatApp = new Hono()
         const model = myProvider.languageModel(
           isProduction ? selectedModelId : DEVELOPMENT_CHAT_MODEL
         );
+
         const result = await streamText({
           model,
           providerOptions: {
             google: {
               // see: https://ai.google.dev/gemini-api/docs/thinking
               thinkingConfig: {
-                thinkingBudget: 1024,
-                includeThoughts: IS_THINKING,
+                // Turn on dynamic thinking:
+                thinkingBudget: -1,
+                includeThoughts: isDeepThink,
               },
             },
           },
@@ -167,10 +164,10 @@ export const chatApp = new Hono()
             console.log("completed messages length", messages.length);
             console.log("responseMessage", responseMessage);
             try {
-              // IS_THINKING 为 true 时，仅持久化非 assistant 的消息（如 tool 调用等）
+              // 当启用思考模式时，仅持久化非 assistant 的消息（如 tool 调用等）
               // assistant 最终消息交由前端 finalize 接口一次性写入，避免重复
               let msgs = messages;
-              if (IS_THINKING) {
+              if (isDeepThink) {
                 const nonAssistantMessages = messages.filter(
                   (m) => m.role !== "assistant"
                 );
@@ -188,22 +185,6 @@ export const chatApp = new Hono()
                   skipDuplicates: true,
                 });
               }
-
-              // // 在流结束时，确保将最终的 assistant parts 一并写入（含 reasoning 等元信息）
-              // if (responseMessage?.id) {
-              //   await prisma.message.upsert({
-              //     where: { id: responseMessage.id },
-              //     update: {
-              //       parts: JSON.parse(JSON.stringify(responseMessage.parts)),
-              //     },
-              //     create: {
-              //       id: responseMessage.id,
-              //       role: responseMessage.role,
-              //       parts: JSON.parse(JSON.stringify(responseMessage.parts)),
-              //       chatId: id,
-              //     },
-              //   });
-              // }
             } catch (error) {
               console.log("toUIMessageStreamResponse onFinish error:", error);
             }

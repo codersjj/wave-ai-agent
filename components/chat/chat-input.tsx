@@ -21,7 +21,7 @@ import {
   PromptInputTextarea,
   PromptInputTools,
 } from "../ai-elements/prompt-input";
-import { ArrowUpIcon, LucideSettings2, XIcon } from "lucide-react";
+import { ArrowUpIcon, LucideSettings2, XIcon, BrainIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MODEL_OPTIONS } from "@/lib/ai/models";
 import { useLocalChat } from "@/hooks/use-local-chat";
@@ -54,18 +54,19 @@ const ChatInput = ({
   sendMessage,
   stop,
 }: ChatInputProps) => {
-  console.log("🚀 ~ ChatInput ~ chatId:", chatId);
   const { localModelId, setLocalModelId } = useLocalChat();
   const [toolsOpen, setToolsOpen] = useState<boolean>(false);
   const [selectedTool, setSelectedTool] = useState<AvailableToolType | null>(
     null
   );
+  const [isDeepThinkMode, setIsDeepThinkMode] = useState<boolean>(false);
 
   const placeholder = "Ask, search or create notes...";
 
   const selectedModelId = localModelId || initialModelId;
 
   const isGenerating = status === "submitted" || status === "streaming";
+  const showDeepThinkButton = selectedModelId.includes("gemini");
 
   const handleSelect = (val: string) => {
     setLocalModelId(val);
@@ -78,6 +79,10 @@ const ChatInput = ({
 
   const handleToolRemove = () => {
     setSelectedTool(null);
+  };
+
+  const handleDeepThinkToggle = () => {
+    setIsDeepThinkMode(!isDeepThinkMode);
   };
 
   const handleSubmit = useCallback(
@@ -122,6 +127,7 @@ const ChatInput = ({
           body: {
             selectedModelId: selectedModelId,
             selectedToolName: selectedTool?.toolName ?? null,
+            isDeepThink: isDeepThinkMode,
           },
         }
       );
@@ -137,6 +143,7 @@ const ChatInput = ({
       selectedModelId,
       selectedTool,
       setInput,
+      isDeepThinkMode,
     ]
   );
 
@@ -192,6 +199,22 @@ const ChatInput = ({
               selectedModelId={selectedModelId}
               onSelect={handleSelect}
             />
+
+            {showDeepThinkButton && (
+              <PromptInputButton
+                className={`cursor-pointer ${
+                  isDeepThinkMode
+                    ? "text-primary dark:text-green-200 bg-primary/10 hover:bg-primary/20"
+                    : "text-muted-foreground"
+                }`}
+                size="sm"
+                variant={"outline"}
+                onClick={handleDeepThinkToggle}
+              >
+                <BrainIcon className="size-4" />
+                <span>DeepThink</span>
+              </PromptInputButton>
+            )}
 
             <Popover open={toolsOpen} onOpenChange={setToolsOpen}>
               <PopoverTrigger asChild>
