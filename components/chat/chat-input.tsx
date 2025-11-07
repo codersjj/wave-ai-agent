@@ -30,6 +30,7 @@ import { AVAILABLE_TOOLS, AvailableToolType } from "@/lib/ai/tools/constant";
 import { Button } from "../ui/button";
 import { RiSquareFill } from "@remixicon/react";
 import { toast } from "sonner";
+import useViewState from "@/hooks/use-view-state";
 
 interface ChatInputProps {
   chatId: string;
@@ -60,6 +61,8 @@ const ChatInput = ({
     null
   );
   const [isDeepThinkMode, setIsDeepThinkMode] = useState<boolean>(false);
+
+  const { setIsChatView } = useViewState();
 
   const placeholder = "Ask, search or create notes...";
 
@@ -111,7 +114,8 @@ const ChatInput = ({
       // causing Next.js to perform navigation. If you want the app router to
       // handle the route change (and possibly reload layouts/data), use
       // next/navigation's router.push or router.replace instead.
-      window.history.replaceState({}, "", `/chat/${chatId}`);
+      window.history.replaceState({}, "", `/chat/${chatId}?isChatView=true`);
+      setIsChatView(true);
 
       sendMessage(
         {

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useLocalChat } from "@/hooks/use-local-chat";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface HeaderProps {
   title?: string;
@@ -15,10 +16,22 @@ interface HeaderProps {
 const Header = ({ title, showActions }: HeaderProps) => {
   const { open: isSidebarOpen, isMobile } = useSidebar();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleNewChatClick = () => router.push("/chat");
 
-  const { onToggleHistory } = useLocalChat();
+  const { isHistoryOpen, onToggleHistory } = useLocalChat();
+
+  const handleHistoryClick = async (isHistoryOpen: boolean) => {
+    onToggleHistory();
+    if (!isHistoryOpen) {
+      // 直接重新获取聊天列表
+      await queryClient.refetchQueries({
+        queryKey: ["chats"],
+        exact: true,
+      });
+    }
+  };
 
   return (
     <header
@@ -63,7 +76,7 @@ const Header = ({ title, showActions }: HeaderProps) => {
             variant="ghost"
             size="sm"
             className="h-8 gap-1 cursor-pointer"
-            onClick={onToggleHistory}
+            onClick={() => handleHistoryClick(isHistoryOpen)}
           >
             <RiHistoryLine className="size-4" />
             <span className="hidden sm:inline">Chat History</span>

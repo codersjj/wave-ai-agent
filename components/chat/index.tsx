@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { DefaultChatTransport, UIMessage } from "ai";
 import { useChat } from "@ai-sdk/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn, generateUUID } from "@/lib/utils";
 import { DEFAULT_MODEL_ID } from "@/lib/ai/models";
 import ChatInput from "./chat-input";
 import { toast } from "sonner";
 import ChatMessages from "./chat-messages";
+import { api } from "@/lib/hono/rpc";
 
 interface ChatInterfaceProps {
   chatId: string;
@@ -27,6 +29,7 @@ const ChatInterface = ({
   className,
 }: ChatInterfaceProps) => {
   const [input, setInput] = useState<string>("");
+  const queryClient = useQueryClient();
 
   const { messages, setMessages, sendMessage, status, stop, error } =
     useChat<UIMessage>({
@@ -48,7 +51,30 @@ const ChatInterface = ({
         },
       }),
       async onToolCall() {},
-      onFinish: () => {},
+      onFinish: async ({ messages }) => {
+        // 检查是否是新聊天的第一条用户消息并收到回复
+        const isUserFirstMessage =
+          messages.length === 2 &&
+          messages[0]?.role === "user" &&
+          messages[1]?.role === "assistant";
+
+        if (isUserFirstMessage) {
+          console.log(
+            "🔄 New chat first message completed, fetching chat title for chatId:",
+            chatId
+          );
+          // 只在新聊天第一条消息完成时请求 title 数据
+          await queryClient.fetchQuery({
+            queryKey: ["chat", chatId],
+            queryFn: async () => {
+              const res = await api.chat[":id"].$get({ param: { id: chatId } });
+              if (!res.ok) throw new Error("Failed to fetch chat");
+              const { data } = await res.json();
+              return data;
+            },
+          });
+        }
+      },
       onError: (error) => {
         console.log("Chat error:", error);
         // toast.error(error instanceof Error ? error.message : "useChat error");
