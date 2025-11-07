@@ -148,6 +148,7 @@ const ChatInput = ({
       selectedTool,
       setInput,
       isDeepThinkMode,
+      setIsChatView,
     ]
   );
 

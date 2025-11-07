@@ -58,15 +58,8 @@ export const useFinalizeMessageParts = () => {
       }
       return await res.json();
     },
-    onSuccess: async (_, variables) => {
-      // 刷新当前 chat 数据以获取生成的 title
-      const chatId = variables.json.chatId;
-      console.log(
-        "🔄 Finalize completed, invalidating queries for chatId:",
-        chatId
-      );
-      await queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
-      await queryClient.invalidateQueries({ queryKey: ["chats"] });
+    onSuccess: async () => {
+      console.log("useFinalizeMessageParts mutation success~~");
     },
   });
 };

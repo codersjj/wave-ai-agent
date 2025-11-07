@@ -7,13 +7,15 @@ import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useLocalChat } from "@/hooks/use-local-chat";
 import { useQueryClient } from "@tanstack/react-query";
+import { useChatById } from "@/features/use-chat";
 
 interface HeaderProps {
   title?: string;
   showActions?: boolean;
+  chatId?: string;
 }
 
-const Header = ({ title, showActions }: HeaderProps) => {
+const Header = ({ title, showActions, chatId }: HeaderProps) => {
   const { open: isSidebarOpen, isMobile } = useSidebar();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -33,6 +35,10 @@ const Header = ({ title, showActions }: HeaderProps) => {
     }
   };
 
+  const { data } = useChatById(chatId ?? "", false);
+  const showTitle = data?.title || title;
+  console.log("🚀 ~ Header ~ showTitle:", showTitle);
+
   return (
     <header
       className={cn(
@@ -49,13 +55,13 @@ const Header = ({ title, showActions }: HeaderProps) => {
       </div>
 
       {/* 中间：标题区域 */}
-      {title && (
+      {showTitle && (
         <div className="flex-1 min-w-0 mx-3">
           <h2
             className="text-lg lg:text-xl font-semibold truncate text-foreground/90"
-            title={title}
+            title={showTitle}
           >
-            {title}
+            {showTitle}
           </h2>
         </div>
       )}
