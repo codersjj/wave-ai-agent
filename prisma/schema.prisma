@@ -10,17 +10,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  notes         Note[]
-  chats         Chat[]
+  id               String         @id
+  name             String
+  email            String
+  emailVerified    Boolean        @default(false)
+  stripeCustomerId String? // Optional
+  image            String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @default(now()) @updatedAt
+  sessions         Session[]
+  accounts         Account[]
+  notes            Note[]
+  chats            Chat[]
+  Subscription     Subscription[]
 
   @@unique([email])
   @@map("user")
@@ -85,12 +87,12 @@ model Note {
 }
 
 model Chat {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages  Message[]
 
   @@index([userId])
@@ -114,4 +116,29 @@ model Message {
 
   @@index([chatId])
   @@map("message")
+}
+
+enum Plan {
+  free
+  plus
+  premium
+}
+
+model Subscription {
+  id                   String    @id @default(uuid())
+  plan                 Plan      @default(free)
+  referenceId          String // Usually corresponds to User.id (or org ID)
+  stripeCustomerId     String? // Optional
+  stripeSubscriptionId String? // Optional
+  status               String
+  periodStart          DateTime?
+  periodEnd            DateTime?
+  cancelAtPeriodEnd    Boolean?  @default(false)
+  seats                Int?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+
+  user User @relation(fields: [referenceId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
 }
