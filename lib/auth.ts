@@ -25,6 +25,7 @@ export const auth = betterAuth({
       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
       createCustomerOnSignUp: true,
       onCustomerCreate: async ({ stripeCustomer, user }) => {
+        console.log("🚀 ~ stripeCustomer, user:", stripeCustomer, user);
         await createDefaultSubscription(user.id, stripeCustomer.id);
       },
       subscription: {

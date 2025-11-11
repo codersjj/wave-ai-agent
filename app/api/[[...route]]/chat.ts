@@ -11,7 +11,10 @@ import { ChatModel, DEVELOPMENT_CHAT_MODEL } from "@/lib/ai/models";
 import { zValidator } from "@hono/zod-validator";
 import { getAuthUserMiddleware } from "@/lib/hono/middleware";
 import prisma from "@/lib/prisma";
-import { generateTitleForUserMessage } from "@/app/actions";
+import {
+  checkGenerationLimit,
+  generateTitleForUserMessage,
+} from "@/app/actions";
 import { isProduction, myProvider } from "@/lib/ai/provider";
 import { generateUUID } from "@/lib/utils";
 import { HTTPException } from "hono/http-exception";
@@ -62,6 +65,14 @@ export const chatApp = new Hono()
         const user = c.get("user");
         const { id, message, selectedModelId, selectedToolName, isDeepThink } =
           c.req.valid("json");
+
+        const { isAllowed } = await checkGenerationLimit(user.id);
+
+        if (!isAllowed) {
+          throw new HTTPException(403, {
+            message: "Generation limit reached!",
+          });
+        }
 
         // find the chat data
         let chat = await prisma.chat.findUnique({

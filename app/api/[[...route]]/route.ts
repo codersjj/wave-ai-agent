@@ -4,13 +4,15 @@ import { HTTPException } from "hono/http-exception";
 import { getAuthUserMiddleware } from "@/lib/hono/middleware";
 import { noteApp } from "./note";
 import { chatApp } from "./chat";
+import { subscriptionApp } from "./subscription";
 
 export const runtime = "nodejs";
 
 const app = new Hono()
   .basePath("/api")
   .route("/note", noteApp)
-  .route("/chat", chatApp);
+  .route("/chat", chatApp)
+  .route("/subscription", subscriptionApp);
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
