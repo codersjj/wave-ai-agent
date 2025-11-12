@@ -48,7 +48,7 @@ const Header = ({ title, showActions, chatId }: HeaderProps) => {
       )}
     >
       {/* 左侧：侧边栏触发器 */}
-      <div className="pl-3">
+      <div className="relative flex items-center pl-3 h-full">
         {/* {(!isSidebarOpen || isMobile) && ( */}
         <SidebarTrigger
           className={cn(
@@ -56,9 +56,13 @@ const Header = ({ title, showActions, chatId }: HeaderProps) => {
             // 移动端始终显示
             isMobile && "opacity-100",
             // 桌面端：侧边栏关闭时才显示，且有延迟
-            !isMobile && !isSidebarOpen && "opacity-100 delay-100",
+            !isMobile &&
+              !isSidebarOpen &&
+              "absolute top-1/2 left-1/2 -translate-y-1/2 opacity-100 delay-100",
             // 桌面端：侧边栏打开时隐藏
-            !isMobile && isSidebarOpen && "opacity-0"
+            !isMobile &&
+              isSidebarOpen &&
+              "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0"
           )}
         />
         {/* )} */}
@@ -66,7 +70,12 @@ const Header = ({ title, showActions, chatId }: HeaderProps) => {
 
       {/* 中间：标题区域 */}
       {showTitle && (
-        <div className="flex-1 min-w-0 mx-3">
+        <div
+          className={cn(
+            "flex-1 min-w-0 mx-3 transition-transform",
+            !isMobile && !isSidebarOpen && "translate-x-4 delay-100"
+          )}
+        >
           <h2
             className="text-lg lg:text-xl font-semibold truncate text-foreground/90"
             title={showTitle}
