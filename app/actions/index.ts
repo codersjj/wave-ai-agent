@@ -72,6 +72,7 @@ export async function checkGenerationLimit(userId: string) {
       status: SUBSCRIPTION_STATUS.ACTIVE,
     },
   });
+  console.log("🚀 ~ checkGenerationLimit ~ subscription:", subscription);
 
   if (!subscription) {
     throw new HTTPException(400, { message: "No active subscription" });

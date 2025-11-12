@@ -56,6 +56,7 @@ export const subscriptionApp = new Hono()
           checkoutUrl: data.url,
         });
       } catch (error) {
+        console.log("🚀 ~ error:", error);
         if (error instanceof HTTPException) {
           throw error;
         }
