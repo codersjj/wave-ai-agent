@@ -14,6 +14,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarTrigger,
+  useSidebar,
 } from "../ui/sidebar";
 import Logo from "@/components/logo";
 import { useAuthToken } from "@/hooks/use-auth-token";
@@ -55,6 +56,7 @@ const AppSidebar = (props: React.ComponentProps<typeof Sidebar>) => {
   const { signOut, useSession } = authClient;
   const { data: session, isPending } = useSession();
   const user = session?.user;
+  const { open: isSidebarOpen, isMobile } = useSidebar();
 
   const handleLogout = async () => {
     setIsSigningOut(true);
@@ -78,7 +80,12 @@ const AppSidebar = (props: React.ComponentProps<typeof Sidebar>) => {
       <SidebarHeader>
         <div className="flex justify-between items-center w-full">
           <Logo url="/home" />
-          <SidebarTrigger className="-ms-4" />
+          <SidebarTrigger
+            className={cn(
+              "-ms-4 transition-opacity",
+              !isSidebarOpen && !isMobile && "opacity-0"
+            )}
+          />
         </div>
         <hr className="mx-2 -mt-px border-border" />
         {/* Search Button */}

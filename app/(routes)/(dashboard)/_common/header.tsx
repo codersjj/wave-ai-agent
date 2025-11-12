@@ -49,9 +49,19 @@ const Header = ({ title, showActions, chatId }: HeaderProps) => {
     >
       {/* 左侧：侧边栏触发器 */}
       <div className="pl-3">
-        {(!isSidebarOpen || isMobile) && (
-          <SidebarTrigger className="cursor-pointer" />
-        )}
+        {/* {(!isSidebarOpen || isMobile) && ( */}
+        <SidebarTrigger
+          className={cn(
+            "transition-opacity cursor-pointer",
+            // 移动端始终显示
+            isMobile && "opacity-100",
+            // 桌面端：侧边栏关闭时才显示，且有延迟
+            !isMobile && !isSidebarOpen && "opacity-100 delay-100",
+            // 桌面端：侧边栏打开时隐藏
+            !isMobile && isSidebarOpen && "opacity-0"
+          )}
+        />
+        {/* )} */}
       </div>
 
       {/* 中间：标题区域 */}
