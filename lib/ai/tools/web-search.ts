@@ -22,6 +22,7 @@ const webSearch = () =>
         });
 
         const results = response.results.map((r) => {
+          // @ts-expect-error: API response includes favicon but type definition is outdated
           const { title, url, content, favicon } = r;
           return {
             title,
