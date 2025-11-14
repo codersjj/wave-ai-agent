@@ -16,5 +16,5 @@ export default async function WebLayout({
     redirect("/home");
   }
 
-  return <div>WebLayout{children}</div>;
+  return <div>{children}</div>;
 }
