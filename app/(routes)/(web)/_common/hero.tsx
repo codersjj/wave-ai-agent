@@ -60,7 +60,7 @@ const Hero = () => {
             className="rounded-full px-6 py-5 sm:py-6 text-sm sm:text-base hover:bg-muted/20"
             asChild
           >
-            <Link href="/learn-more">Learn More</Link>
+            <Link href="https://github.com/codersjj/wave-ai-agent" target="_blank">Learn More</Link>
           </Button>
         </div>
       </div>
