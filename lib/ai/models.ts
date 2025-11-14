@@ -27,7 +27,7 @@ export const chatModels: ChatModel[] = [
   //   description: "Google's fast experimental multimodal reasoning model",
   // },
   {
-    id: "models/gemini-2.5-flash",
+    id: "models/gemini-2.5-flash-lite",
     name: "Gemini 2.5 Flash",
     description: "Google's fast experimental multimodal reasoning model",
   },
