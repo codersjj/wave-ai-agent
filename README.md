@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wave AI Agent
 
-## Getting Started
+Wave AI Agent is a cutting-edge, **AI-native SaaS starter kit** designed for building advanced AI agents with sophisticated reasoning capabilities. Unlike simple chat wrappers, Wave provides a complete ecosystem for visual reasoning (Chain of Thought), task planning, artifact generation, and verified SaaS foundations.
 
-First, run the development server:
+Built on **Next.js 15**, **React 19**, and **Tailwind 4**, utilizing **Hono** for a robust backend API and **Better Auth** for secure authentication.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🧠 Advanced AI Capabilities
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Chain of Thought Visualization**: Transparently display the AI's reasoning process, steps, and decision-making logic to users.
+- **Generative UI & Artifacts**: Render code blocks, web previews, and dynamic components directly in the chat stream.
+- **Visual Flow**: Visualize complex logic and node connections (powered by XYFlow).
+- **Tool Integration**: Built-in support for external tools (Search, etc.) with `ai` SDK.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🛠️ Production-Ready SaaS Foundation
 
-## Learn More
+- **Authentication**: Secure, customizable auth flows using [Better Auth](https://github.com/better-auth/better-auth).
+- **Subscription & Billing**: Integrated Stripe payments with comprehensive subscription management.
+- **Database**: Prisma ORM with fully typed schema for managing users, chats, and subscriptions.
+- **Backend API**: Type-safe API routes powered by [Hono](https://hono.dev), running on Next.js Edge/Node runtime.
 
-To learn more about Next.js, take a look at the following resources:
+### 🎨 Premium UI/UX
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Modern Design**: Sleek, dark-mode-first aesthetic using Tailwind CSS v4.
+- **Component Library**: Includes `shadcn/ui` primitives and custom AI-specific components (e.g., `ChainOfThought`, `WebPreview`, `Artifact`).
+- **Data Fetching**: Optimized state management with TanStack Query.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
+### Prerequisites
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Node.js 20+
+- npm, pnpm, or bun
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <your-repo-url>
+   cd wave-ai-agent
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   # or
+   pnpm install
+   # or
+   bun install
+   ```
+
+3. **Environment Setup**
+
+   Copy the `.env.example` (or create one) and add your keys:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   *Required keys typically include `DATABASE_URL`, `BETTER_AUTH_SECRET`, `OPENAI_API_KEY` (or Google/Anthropic), and `STRIPE_SECRET_KEY`.*
+
+4. **Initialize Database**
+
+   ```bash
+   npm run db:migrate
+   ```
+
+5. **Run Development Server**
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 👥 Who is this for?
+
+This project is the perfect starting point for:
+
+- **AI Engineers & Prototypers**: Who need more than a text box. Detailed "Chain of Thought" and "Plan" components allow you to build agents that solve complex problems and explain their work.
+- **SaaS Founders**: Creating vertical AI agents (e.g., "AI for Legal", "AI for Coding"). The included Auth, Billing, and Database setup saves weeks of boilerplate work.
+- **Frontend Architects**: Looking for a reference implementation of React 19, Tailwind 4, and Next.js 15 in a real-world application.
+
+## 🏗️ Project Structure
+
+- `app/(routes)`: Application page routes (Dashboard, Auth, etc.).
+- `app/api`: Hono API handlers.
+- `components/ai-elements`: Specialized components for AI interactions (Reasoning, Tools, Artifacts).
+- `features`: Core business logic hooks (Chat, Notes, Subscription).
+- `lib`: Utilities and configuration.
+- `prisma`: Database schema and migrations.
+
+## 📚 Learn More
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Vercel AI SDK](https://sdk.vercel.ai/docs)
+- [Hono Documentation](https://hono.dev)
+- [Better Auth](https://better-auth.com)
